@@ -912,23 +912,37 @@ from django.db.models.functions import TruncDay
 def get_rolling_average_prices(request):
     property_type = request.GET.get('property_type', 'All')
     region = request.GET.get('region', 'All')
-    location = request.GET.get('location', '')
-    print(location)
+    locations = request.GET.get('location', '')
+
+    # Split locations by comma if it's a string
+    if locations:
+        locations = locations.split(',')
+    
+    print(f"Property Type: {property_type}")
+    print(f"Region: {region}")
+    print(f"Locations: {locations}")
 
     queryset = PropertyPriceHistory.objects.filter(property__sold=False)
+    
     if property_type != 'All':
         queryset = queryset.filter(property__type=property_type)
     if region != 'All':
         queryset = queryset.filter(property__region__name=region)
-    if location:
-        queryset = queryset.filter(property__location__icontains=location)
-    
+    if locations:
+        location_query = Q()
+        for location in locations:
+            location_query |= Q(property__location__icontains=location)
+        queryset = queryset.filter(location_query)
+
     # Aggregate average prices by date
     date_prices = queryset.annotate(
         truncated_date=TruncDay('date')
     ).values('truncated_date').annotate(
         avg_price=Avg('price')
     ).order_by('truncated_date')
+    
+    print(f"Queryset Count: {queryset.count()}")
+    print(date_prices)
 
     return JsonResponse(list(date_prices), safe=False)
 

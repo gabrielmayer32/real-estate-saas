@@ -47,7 +47,7 @@ const StyledLink = styled(Link)`
   }
 `;
 
-const Navbar = ({ currency, setCurrency, propertyType, setPropertyType, region, setRegion, location, setLocation }) => {
+const Navbar = ({ currency, setCurrency, propertyType, setPropertyType, region, setRegion, location, setLocation , setLocations }) => {
   const [selectedKey, setSelectedKey] = useState('1');
   const locationHook = useLocation();
 
@@ -113,7 +113,7 @@ const Navbar = ({ currency, setCurrency, propertyType, setPropertyType, region, 
           <h4>Select a property type</h4>
           <PropertyTypeSelector propertyType={propertyType} setPropertyType={setPropertyType} />
           <h4>Select a region</h4>
-          <RegionSelector region={region} setRegion={setRegion} location={location} setLocation={setLocation} />
+          <RegionSelector region={region} setRegion={setRegion} location={location} setLocation={setLocation} setLocations={setLocations} />
         </SelectorsContainer>
       )}
     </NavbarContainer>

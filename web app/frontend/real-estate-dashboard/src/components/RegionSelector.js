@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
+import Select from 'react-select';
 
 const SelectorContainer = styled.div`
   margin-bottom: 20px;
@@ -23,36 +24,33 @@ const Button = styled.button`
   }
 `;
 
-const Dropdown = styled.select`
-  padding: 10px;
-  margin-top: 5px;
-  font-size: 12px;
-  width: 200px;
-`;
-
 const regions = ['All', 'West', 'East', 'North', 'South', 'Center'];
 
-const RegionSelector = ({ region, setRegion, location, setLocation }) => {
-  const [locations, setLocations] = useState([]);
+const RegionSelector = ({ region, setRegion, locations, setLocations }) => {
+  const [locationOptions, setLocationOptions] = useState([]);
 
   useEffect(() => {
     if (region && region !== 'All') {
       axios.get(`http://localhost:8000/api/locations/?region=${region}`)
         .then(response => {
-          setLocations(response.data);
+          const options = response.data.map(loc => ({
+            value: loc.id,
+            label: loc.name
+          }));
+          setLocationOptions(options);
         })
         .catch(error => {
           console.error('Error fetching locations:', error);
         });
     } else {
+      setLocationOptions([]);
       setLocations([]);
-      setLocation('');
     }
-  }, [region]);
+  }, [region, locations]);
 
-  const handleLocationChange = (e) => {
-    setLocation(e.target.value);
-    console.log('Location selected:', e.target.value); // Add debug log
+  const handleLocationChange = (selectedOptions) => {
+    setLocations(selectedOptions || []);
+    console.log('Locations selected:', selectedOptions); // Add debug log
   };
 
   return (
@@ -63,7 +61,7 @@ const RegionSelector = ({ region, setRegion, location, setLocation }) => {
           active={region === reg}
           onClick={() => {
             setRegion(reg);
-            setLocation('');
+            setLocations([]);
             console.log('Region selected:', reg); // Add debug log
           }}
         >
@@ -71,17 +69,18 @@ const RegionSelector = ({ region, setRegion, location, setLocation }) => {
         </Button>
       ))}
       {region && region !== 'All' && (
-        <Dropdown
-          value={location}
+        <Select
+          isMulti
+          options={locationOptions}
+          value={locations}
           onChange={handleLocationChange}
-        >
-          <option value="">Select Location</option>
-          {locations.map(loc => (
-            <option key={loc.id} value={loc.name}>
-              {loc.name}
-            </option>
-          ))}
-        </Dropdown>
+          placeholder="Select Locations"
+          styles={{
+            container: provided => ({ ...provided, marginTop: 5, width: '200px' }),
+            menu: provided => ({ ...provided, fontSize: '12px' }),
+            control: provided => ({ ...provided, fontSize: '12px' })
+          }}
+        />
       )}
     </SelectorContainer>
   );

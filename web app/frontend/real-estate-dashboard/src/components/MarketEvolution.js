@@ -34,7 +34,7 @@ const ChartContainer = styled.div`
   box-shadow: 0 3px 6px rgba(0,0,0,0.1);
 `;
 
-const MarketEvolution = ({ currency, propertyType, region, location }) => {
+const MarketEvolution = ({ currency, propertyType, region, locations }) => {
   const [chartData, setChartData] = useState({
     labels: [],
     datasets: [{
@@ -49,11 +49,23 @@ const MarketEvolution = ({ currency, propertyType, region, location }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        console.log("Original Locations Array:", locations);
+
+        // Ensure each location object has a 'label' property
+        const locationLabels = locations.map(location => {
+          if (location && location.label) {
+            return location.label;
+          }
+          return '';
+        }).filter(label => label); // Filter out empty strings
+
+        console.log("Formatted Location Labels:", locationLabels);
+
         const response = await axios.get('http://localhost:8000/api/rolling-average-prices/', {
           params: {
             property_type: propertyType,
             region: region,
-            location: location
+            location: locationLabels.join(',')  // Join location labels into a comma-separated string
           }
         });
         console.log("API response:", response.data);  // Log the API response
@@ -84,7 +96,7 @@ const MarketEvolution = ({ currency, propertyType, region, location }) => {
     };
 
     fetchData();
-  }, [propertyType, region, location]);
+  }, [propertyType, region, locations]);
 
   return (
     <ChartContainer>

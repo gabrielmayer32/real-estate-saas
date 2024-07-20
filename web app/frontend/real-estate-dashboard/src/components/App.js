@@ -33,7 +33,9 @@ const App = () => {
   const [currency, setCurrency] = useState('Rs');
   const [propertyType, setPropertyType] = useState('All');
   const [region, setRegion] = useState('All');
-  const [location, setLocation] = useState(''); // Add location state here
+  const [location, setLocation] = useState('');
+  const [locations, setLocations] = useState('');
+
 
   return (
     <Router>
@@ -46,14 +48,15 @@ const App = () => {
           region={region}
           setRegion={setRegion}
           location={location}
-          setLocation={setLocation} // Pass location state to Navbar
+          setLocation={setLocation}
+          setLocations={setLocations}
         />
         <ContentContainer>
           <Routes>
             <Route path="/" element={<Dashboard currency={currency} setCurrency={setCurrency} propertyType={propertyType} setPropertyType={setPropertyType} region={region} setRegion={setRegion} location={location} setLocation={setLocation} />} />
             <Route path="/real-estate-agent" element={<RealEstateAgentDashboard currency={currency} setCurrency={setCurrency} propertyType={propertyType} setPropertyType={setPropertyType} region={region} setRegion={setRegion} location={location} setLocation={setLocation} />} />
             <Route path="/valuation-tool" element={<ValuationTool currency={currency} setCurrency={setCurrency} propertyType={propertyType} setPropertyType={setPropertyType} region={region} setRegion={setRegion} location={location} setLocation={setLocation} />} />
-            <Route path="/market-analysis" element={<MarketEvolution currency={currency} propertyType={propertyType} region={region} location={location} />} />
+            <Route path="/market-analysis" element={<MarketEvolution currency={currency} propertyType={propertyType} region={region} location={location} locations={locations} />} />
             <Route path="/investment-opportunities" element={<MarketAnalysis currency={currency} propertyType={propertyType} region={region} location={location} />} />
             <Route path="/sold-properties" element={<SoldProperties currency={currency} propertyType={propertyType} region={region} location={location} />} />
             <Route path="/new-listings" element={<NewListings currency={currency} propertyType={propertyType} region={region} location={location} />} /> {/* Add this line */}
